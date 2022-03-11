@@ -149,8 +149,9 @@ def get_job_name(phase, strip_compiler, spec, osarch, build_group):
         phase (str): Either 'specs' for the main phase, or the name of a
             bootstrapping phase
         strip_compiler (bool): Should compiler be stripped from job name
-        spec (Spec): Spec job will build
-        osarch (ArchSpec): Architecture to add
+        spec (spack.spec.Spec): Spec job will build
+        osarch: Architecture TODO: (this is a spack.spec.ArchSpec,
+            but sphinx doesn't recognize the type and fails).
         build_group (str): Name of build group this job belongs to (a CDash
         notion)
 
@@ -610,8 +611,9 @@ def generate_gitlab_ci_yaml(env, print_summary, output_file,
         the spec matrix in the active environment.
 
     Arguments:
-        env (Environment): Activated environment object which must contain
-            a gitlab-ci section describing how to map specs to runners
+        env (spack.environment.Environment): Activated environment object
+            which must contain a gitlab-ci section describing how to map
+            specs to runners
         print_summary (bool): Should we print a summary of all the jobs in
             the stages in which they were placed.
         output_file (str): File path where generated file should be written
@@ -1315,8 +1317,9 @@ def import_signing_key(base64_signing_key):
 
     Arguments:
         base64_signing_key (str): A gpg key including the secret key,
-        armor-exported and base64 encoded, so it can be stored in a gitlab
-        CI variable.  For an example of how to generate such a key, see:
+            armor-exported and base64 encoded, so it can be stored in a
+            gitlab CI variable.  For an example of how to generate such
+            a key, see:
 
         https://github.com/spack/spack-infrastructure/blob/main/gitlab-docker/files/gen-key
     """
@@ -1382,7 +1385,7 @@ def configure_compilers(compiler_action, scope=None):
     Arguments:
         compiler_action (str): 'FIND_ANY', 'INSTALL_MISSING' have meanings
             described above.  Any other value essentially results in a no-op.
-        scope (ConfigScope): Optional.  The scope in which to look for
+        scope (spack.config.ConfigScope): Optional.  The scope in which to look for
             compilers, in case 'FIND_ANY' was provided.
     """
     if compiler_action == 'INSTALL_MISSING':
@@ -1416,9 +1419,9 @@ def get_concrete_specs(env, root_spec, job_name, related_builds,
 
     Arguments:
 
-        env (Environment): Activated spack environment used to get
-            concrete root spec by hash in case compiler_action is
-            anthing other than FIND_ANY.
+        env (spack.environment.Environment): Activated spack environment
+            used to get concrete root spec by hash in case compiler_action
+            is anthing other than FIND_ANY.
         root_spec (str): If compiler_action is FIND_ANY root_spec is
             a string representation which can be turned directly into
             a spec, otherwise, it's a hash used to index the activated
@@ -1437,11 +1440,10 @@ def get_concrete_specs(env, root_spec, job_name, related_builds,
     .. code-block:: JSON
 
        {
-           "root": <spec>,
-           "<job-pkg-name>": <spec>,
+           "root": "<spec>",
+           "<job-pkg-name>": "<spec>",
            "deps": {
-               <dep-name>: <spec>,
-               ...
+               "<dep-name>": "<spec>"
            }
         }
 
@@ -1620,7 +1622,7 @@ def write_cdashid_to_mirror(cdashid, spec, mirror_url):
     Arguments:
 
         cdashid (str): CDash build id to be pushed to the mirror as a file
-        spec (Spec): Concrete spec associated with build
+        spec (spack.spec.Spec): Concrete spec associated with build
         mirror_url (str): Base mirror url (not including "build_cache")
     """
     if not spec.concrete:
@@ -1658,7 +1660,7 @@ def read_cdashid_from_mirror(spec, mirror_url):
 
     Arguments:
 
-        spec (Spec): Concrete spec for which build id is desired
+        spec (spack.spec.Spec): Concrete spec for which build id is desired
         mirror_url (str): Base url of mirror (not including "build_cache")
 
     Returns:
@@ -1701,8 +1703,9 @@ def push_mirror_contents(env, specfile_path, mirror_url, sign_binaries):
 
     Arguments:
 
-        env (Environment): Optional environment.  If provided, it is used
-            to make sure binary package to push exists in the environment.
+        env (spack.environment.Environment): Optional environment.  If
+            provided, it is used to make sure binary package to push
+            exists in the environment.
         specfile_path (str): Path to spec.json corresponding to built pkg
             to push.
         mirror_url (str): Base url of target mirror
@@ -1739,7 +1742,7 @@ def copy_stage_logs_to_artifacts(job_spec, job_log_dir):
 
     Arguments:
 
-        job_spec (Spec): Spec associated with spack install log
+        job_spec (spack.spec.Spec): Spec associated with spack install log
         job_log_dir (str): Path into which build log should be copied
     """
     try:
